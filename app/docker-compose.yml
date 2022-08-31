@@ -1,11 +1,10 @@
 version: "3.7"
 
 services:
-  docs:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
     ports:
       - 3000:3000
     volumes:

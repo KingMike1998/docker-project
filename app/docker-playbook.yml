@@ -1,0 +1,75 @@
+---
+- hosts: linux
+  become: yes
+  gather_facts: false
+  tasks:
+  - name: Install docker packages
+    remote_user: mike
+    apt:
+      name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+      state: present
+      update_cache: yes
+    tags:
+      - docker
+  - name: Add Docker's GPG key for ubuntu from official site
+    remote_user: mike
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+    tags:
+      - docker
+  - name: Verify gpg key with the fingerprint
+    remote_user: mike
+    apt_key:
+      id: 0EBFCD88
+      state: present
+    tags:
+      - docker
+  - name: Update apt and install docker-ce
+    apt:
+      name: docker-ce
+      state: latest
+      update_cache: true
+  - name: Configure Docker for ubuntu stable repository
+    remote_user: mike
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+      state: present
+      update_cache: yes
+    tags:
+      - docker
+  - name: Update apt packages
+    remote_user: mike
+    apt:
+      update_cache: yes
+    tags:
+      - docker
+  - name: Ensure group "docker" exists
+    ansible.builtin.group:
+      name: docker
+      state: present
+  - name: Add "mike" user to "docker" group
+    remote_user: mike
+    user:
+      name: "mike"
+      group: "docker"
+      append: yes
+    tags:
+      - docker
+  - name: Copy Docker Compose files
+    copy: 
+      src: /home/mike/docker-project/app/
+      dest: tmp/
+  - name: Install express module 
+    community.general.npm: 
+      path: tmp/app
+      state: present
+  - name: Deploy Docker Compose stack
+    community.docker.docker_compose:
+      project_src: tmp/ 
+      build: yes
+    register: output
+
+    
+
+

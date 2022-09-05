@@ -60,6 +60,10 @@
     copy: 
       src: /home/mike/docker-project/app/
       dest: tmp/
+  - name: copy module demo
+    copy: 
+      content: "{{ port }}"
+      dest: /home/mike/tmp/.env
   - name: Install express module 
     community.general.npm: 
       path: tmp/app

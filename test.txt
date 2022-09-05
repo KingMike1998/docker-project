@@ -1,0 +1,31 @@
+    ports:
+      - 3000:3000
+
+  - name: Deploy Docker Compose stack
+    community.docker.docker_compose:
+      project_src: tmp/ 
+      build: yes
+    register: output
+
+version: "3.7"
+
+  - name: Deploy Docker Compose stack
+    community.docker.docker_compose:
+        definition: 
+            services:
+                frontend:
+                    build:
+                        context: .
+                        dockerfile: Dockerfile
+                    ports:
+                        - "3000:3000"
+                    volumes:
+                        - ./:/app
+
+                          - name: Add port parameter to .env file"
+    lineinfile:
+      path: home/mike/tmp/.env
+      regexp: "PORT = 3000"
+      line: "PORT = {{ port }}"
+      create: yes
+      state: present
